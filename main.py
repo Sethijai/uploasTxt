@@ -192,12 +192,12 @@ async def account_login(bot: Client, m: Message):
     else:
         OP = raw_text15
 
-    await editable.edit("**If you want to Download BW Videos then send your BW LOGIN TOKEN to download or send `NO_BW` for not downloading BW\n\nNOTE:- You can send your any working token no need specific token in which batch purchase only need token\nI don't need that specific token in which have TXT file batch 🥰\n\nCREDITS - 𝗛𝗔𝗖𝗞𝗛𝗘𝗜𝗦𝗧**")                                                        
+    await editable.edit("**If you want to Download BW Videos then send your BW LOGIN TOKEN to download or send `NOISE` for not downloading BW\n\nNOTE:- You can send your any working token no need specific token in which batch purchase only need token\nI don't need that specific token in which have TXT file batch 🥰\n\nCREDITS - 𝗛𝗔𝗖𝗞𝗛𝗘𝗜𝗦𝗧**")                                                        
     input20: Message = await bot.listen(editable.chat.id)                                                        
     raw_text20 = input20.text                                                        
     await input20.delete(True)                                                        
     highlighter  = f"️ ⁪⁬⁮⁮⁮"
-    if raw_text20 == 'NO_BW':
+    if raw_text20 == 'NOISE':
         NO_BW = highlighter 
     else:
         NO_BW = raw_text20
@@ -282,7 +282,7 @@ async def account_login(bot: Client, m: Message):
                                                         
             elif '/master.mpd' in url:                                                        
              id =  url.split("/")[-2]                                                        
-             url =  f"https://madxpw.onrender.com/{id}/master.m3u8&token={NO_BW}"
+             url =  f"https://madxapi-d0cbf6ac738c.herokuapp.com/{id}/master.m3u8&token={NO_BW}"
 
             elif '/output.webm' in url:
              url = url.replace('/output.webm', '/hls/master.m3u8')
