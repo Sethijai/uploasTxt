@@ -288,7 +288,7 @@ async def account_login(bot: Client, m: Message):
              url = url.replace('/output.webm', '/hls/master.m3u8')
 
                                                         
-            name1 = links[i][0].replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "@").replace("*", "").replace(".", "").replace("https", "").replace("http", "").replace("NONE", "https://t.me/HIDEUC").strip()                                                        
+            name1 = links[i][0].replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "@").replace("*", "").replace("https", "").replace("http", "").replace("NONE", "https://t.me/HIDEUC").strip()                                                        
             name = f'{OP}😈_{name1[:60]}'                                                        
                                                         
             if "youtu" in url:                                                        
