@@ -282,7 +282,7 @@ async def account_login(bot: Client, m: Message):
                                                         
             elif '/master.mpd' in url:                                                        
              id =  url.split("/")[-2]                                                        
-             url =  f"https://madxapi-d0cbf6ac738c.herokuapp.com/{id}/master.m3u8&token={NO_BW}"
+             url =  f"https://madxapi-d0cbf6ac738c.herokuapp.com/{id}/master.m3u8&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzgzNzI5NDkuNDkyLCJkYXRhIjp7Il9pZCI6IjY0YjY0NDhkNjAxYWM2MDAxOGQ5ODE1MyIsInVzZXJuYW1lIjoiOTM1MjYzMTczMSIsImZpcnN0TmFtZSI6Ik5hbWFuIiwibGFzdE5hbWUiOiIiLCJvcmdhbml6YXRpb24iOnsiX2lkIjoiNWViMzkzZWU5NWZhYjc0NjhhNzlkMTg5Iiwid2Vic2l0ZSI6InBoeXNpY3N3YWxsYWguY29tIiwibmFtZSI6IlBoeXNpY3N3YWxsYWgifSwiZW1haWwiOiJvcG1hc3Rlcjk4NTRAZ21haWwuY29tIiwicm9sZXMiOlsiNWIyN2JkOTY1ODQyZjk1MGE3NzhjNmVmIl0sImNvdW50cnlHcm91cCI6IklOIiwidHlwZSI6IlVTRVIifSwiaWF0IjoxNzM3NzY4MTQ5fQ.2XmPDj4eXBQc1Hn23Ssy8aPIURrgYnikLqgkYi6qHYY"
 
             elif '/output.webm' in url:
              url = url.replace('/output.webm', '/hls/master.m3u8')
