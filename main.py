@@ -27,7 +27,7 @@ import datetime
 import aiohttp
                                                         
 bot = Client("bot",                                                        
-             bot_token=os.environ.get("BOT_TOKEN", "6951998019:AAGWL0XmbHDaJ8WJKn_BGSefdA0Ek9s4FN4"),                                                        
+             bot_token=os.environ.get("BOT_TOKEN", "7251113580:AAFOIpTAGHALclWZBexgNbevU_z6qyZuGnU"),                                                        
              api_id=int(os.environ.get("API_ID", "23713783")),                                                        
              api_hash=os.environ.get("API_HASH", "2daa157943cb2d76d149c4de0b036a99"))
 
@@ -289,7 +289,7 @@ async def account_login(bot: Client, m: Message):
 
                                                         
             name1 = links[i][0].replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "@").replace("*", "").replace("https", "").replace("http", "").replace("NONE", "https://t.me/HIDEUC").strip()                                                        
-            name = f'{OP}😈_{name1[:60]}'                                                        
+            name = f'{OP}_{name1[:60]}'                                                        
                                                         
             if "youtu" in url:                                                        
                 ytf = f"b[height<={raw_text2}][ext=mp4]/bv[height<={raw_text2}][ext=mp4]+ba[ext=m4a]/b[ext=mp4]"                                                        
@@ -303,8 +303,8 @@ async def account_login(bot: Client, m: Message):
                                                         
             try:                                                          
                                                                         
-                cc = f'**{name1} {MR}.mkv**\n\n**❃ 𝗕𝗮𝘁𝗰𝗵 ⍟\n{b_name}**'
-                cc1 = f'**{name1} {MR}.pdf**\n\n**❃ 𝗕𝗮𝘁𝗰𝗵 ⍟\n{b_name}**'
+                cc = f'**{name1} {MR}.mkv**\n\n**🤩 𝗕𝗮𝘁𝗰𝗵 - {b_name}**'
+                cc1 = f'**{name1} {MR}.pdf**\n\n**🤩 𝗕𝗮𝘁𝗰𝗵 - {b_name}**'
                 if "drive" in url:                                                        
                     try:                                                        
                         ka = await helper.download(url, name)                                                        
@@ -341,7 +341,7 @@ async def account_login(bot: Client, m: Message):
                                                         
             except Exception as e:                                                        
                 await m.reply_text(                                                        
-                    f"**Failed to Download/Extract 😫**\n\n**Name** - {cc}\n**𝗟𝗜𝗡𝗞** - {url}\n\nSorry {MR} 🙏**"                                                        
+                    f"{thumb}\n\n**{url}**\n\n**{cc}**\n\nSorry Watch on Youtube🙏**"                                                        
                 )                                                        
                 continue                                                        
                                                         
