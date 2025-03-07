@@ -303,8 +303,8 @@ async def account_login(bot: Client, m: Message):
                                                         
             try:                                                          
                                                                         
-                cc = f'**{name1} {MR}.mkv**\n\n**🤩 𝗕𝗮𝘁𝗰𝗵 - {b_name}**'
-                cc1 = f'**{name1} {MR}.pdf**\n\n**🤩 𝗕𝗮𝘁𝗰𝗵 - {b_name}**'
+                cc = f'**{name1} {MR}.mkv**\n\n**𝗕𝗮𝘁𝗰𝗵 - {b_name}**'
+                cc1 = f'**{name1} {MR}.pdf**\n\n**𝗕𝗮𝘁𝗰𝗵 - {b_name}**'
                 if "drive" in url:                                                        
                     try:                                                        
                         ka = await helper.download(url, name)                                                        
@@ -341,7 +341,7 @@ async def account_login(bot: Client, m: Message):
                                                         
             except Exception as e:                                                        
                 await m.reply_text(                                                        
-                    f"{thumb.jpg}\n\n**{url}**\n\n**{cc}**\n\nSorry Watch on Youtube🙏**"                                                        
+                    f"**𝐖𝐚𝐭𝐜𝐡 𝐓𝐡𝐢𝐬 𝐎𝐧 𝐘𝐎𝐔𝐓𝐔𝐁𝐄 🙏**\n\n**{url}**\n\n**{cc}**"                                                        
                 )                                                        
                 continue                                                        
                                                         
