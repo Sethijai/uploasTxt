@@ -341,7 +341,7 @@ async def account_login(bot: Client, m: Message):
                                                         
             except Exception as e:                                                        
                 await m.reply_text(                                                        
-                    f"{thumb}\n\n**{url}**\n\n**{cc}**\n\nSorry Watch on Youtube🙏**"                                                        
+                    f"{thumb.jpg}\n\n**{url}**\n\n**{cc}**\n\nSorry Watch on Youtube🙏**"                                                        
                 )                                                        
                 continue                                                        
                                                         
