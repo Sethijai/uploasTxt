@@ -236,13 +236,21 @@ async def start_monitoring(client: Client, message: Message):
 
 async def main():
     try:
-        # Check if the client is already running
-        if bot.is_initialized and not bot.is_connected:
+        # Log initial state
+        logger.info(f"Bot initialized: {bot.is_initialized}, Connected: {bot.is_connected}")
+
+        # If the bot is already connected, stop it first
+        if bot.is_connected:
+            logger.info("Bot is already connected. Stopping existing session.")
+            await bot.stop()
+
+        # Start the bot if not already initialized
+        if not bot.is_initialized or not bot.is_connected:
             await bot.start()
             logger.info("Bot started successfully.")
             await asyncio.Event().wait()  # Keep the bot running
         else:
-            logger.warning("Bot is already running or in an invalid state.")
+            logger.warning("Bot is in an unexpected state. Cannot start.")
     except Exception as e:
         logger.error(f"Startup error: {e}")
         print(f"ERROR: Startup failed: {e}")
@@ -253,6 +261,7 @@ async def main():
             logger.info("Bot stopped successfully.")
 
 if __name__ == "__main__":
+    # Create a new event loop
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     try:
