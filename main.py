@@ -130,57 +130,57 @@ async def process_and_send_content(content: str, bot: Client, chat_id: str):
         name, url = content.split(":", 1)
         name = name.strip()
         url = url.strip()
-                                                                                                        
-                                                        
-    if '/master.mpd' in url:                                                        
-        id =  url.split("/")[-2]                                                        
-        url =  f"https://madxapi-d0cbf6ac738c.herokuapp.com/{id}/master.m3u8&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzgzNzI5NDkuNDkyLCJkYXRhIjp7Il9pZCI6IjY0YjY0NDhkNjAxYWM2MDAxOGQ5ODE1MyIsInVzZXJuYW1lIjoiOTM1MjYzMTczMSIsImZpcnN0TmFtZSI6Ik5hbWFuIiwibGFzdE5hbWUiOiIiLCJvcmdhbml6YXRpb24iOnsiX2lkIjoiNWViMzkzZWU5NWZhYjc0NjhhNzlkMTg5Iiwid2Vic2l0ZSI6InBoeXNpY3N3YWxsYWguY29tIiwibmFtZSI6IlBoeXNpY3N3YWxsYWgifSwiZW1haWwiOiJvcG1hc3Rlcjk4NTRAZ21haWwuY29tIiwicm9sZXMiOlsiNWIyN2JkOTY1ODQyZjk1MGE3NzhjNmVmIl0sImNvdW50cnlHcm91cCI6IklOIiwidHlwZSI6IlVTRVIifSwiaWF0IjoxNzM3NzY4MTQ5fQ.2XmPDj4eXBQc1Hn23Ssy8aPIURrgYnikLqgkYi6qHYY"
-                                                        
-        name1 = links[i][0].replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "@").replace("*", "").replace("https", "").replace("http", "").replace("NONE", "https://t.me/HIDEUC").strip()                                                        
-        name = f'{name1[:60]}'                                                        
-                                                        
-            if "youtu" in url:                                                        
-                ytf = f"b[height<=720][ext=mp4]/bv[height<=720][ext=mp4]+ba[ext=m4a]/b[ext=mp4]"                                                        
-            else:                                                        
-                ytf = f"b[height<=720]/bv[height<=720]+ba/b/bv+ba"                                                                                                                
-                                                        
-            try:                                                          
-                                                                        
+
+        if '/master.mpd' in url:
+            id = url.split("/")[-2]
+            url = f"https://madxapi-d0cbf6ac738c.herokuapp.com/{id}/master.m3u8&token=your_token_here"
+
+            name1 = name.replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace("https", "").replace("http", "").replace("NONE", "https://t.me/HIDEUC").strip()
+            name = f'{name1[:60]}'
+
+            if "youtu" in url:
+                ytf = "b[height<=720][ext=mp4]/bv[height<=720][ext=mp4]+ba[ext=m4a]/b[ext=mp4]"
+            else:
+                ytf = "b[height<=720]/bv[height<=720]+ba/b/bv+ba"
+
+            try:
                 cc = f'**{name1}.mkv**\n\n**𝗕𝗮𝘁𝗰𝗵 - OP **'
                 cc1 = f'**{name1}.pdf**\n\n**𝗕𝗮𝘁𝗰𝗵 - OP **'
-                                                                        
-                if ".pdf" in url:                                                        
-                    try:                                                        
-                        cmd = f'yt-dlp -o "{name}.pdf" "{url}"'                                                        
-                        download_cmd = f"{cmd} -R 25 --fragment-retries 25"                                                        
-                        os.system(download_cmd)                                                        
-                        copy = await bot.send_document(chat_id=m.chat.id, document=f'{name}.pdf', caption=cc1)                                                        
-                        count += 1                                                        
-                        os.remove(f'{name}.pdf')                                                        
-                    except FloodWait as e:                                                        
-                        await m.reply_text(str(e))                                                        
-                        time.sleep(e.x)                                                        
-                        continue                                                        
-                else:                                                        
-                    Show = f"**⥥ 📥 ＤＯＷＮＬＯＤＩＮＧ 📥 :-**\n\n**📝Name »** `{name}\n❄𝐐𝐮𝐚𝐥𝐢𝐭𝐲 » {raw_text2}`\n\n**Url :-** `Kya karega URL dekhke ☠️☠️`\n\n **Bot made by {MR} (Daddy)🧑🏻‍💻**"                                                        
-                    prog = await m.reply_text(Show)                                                        
-                    res_file = await helper.download_video(url, cmd, name)                                                        
-                    filename = res_file                                                        
-                    await prog.delete(True)                                                        
-                    await helper.send_vid(bot, m, cc, filename, thumb, name, prog)                                                        
-                    count += 1                                                        
-                    time.sleep(1)                                                        
-                                                        
-            except Exception as e:                                                        
-                await m.reply_text(                                                        
-                    f"**𝐖𝐚𝐭𝐜𝐡 𝐓𝐡𝐢𝐬 𝐎𝐧 𝐘𝐎𝐔𝐓𝐔𝐁𝐄 🙏**\n\n**{url}**\n\n**{cc}**"                                                        
-                )                                                        
-                continue                                                        
-                                                        
-    except Exception as e:                                                        
-        await m.reply_text(e)                                                        
-    await m.reply_text("**Done✅**")                                                        
-                                                        
-                                                        
-bot.run()                                                        
-                                                        
+
+                if ".pdf" in url:
+                    try:
+                        cmd = f'yt-dlp -o "{name}.pdf" "{url}"'
+                        download_cmd = f"{cmd} -R 25 --fragment-retries 25"
+                        os.system(download_cmd)
+                        await bot.send_document(chat_id=chat_id, document=f'{name}.pdf', caption=cc1)
+                        os.remove(f'{name}.pdf')
+                    except FloodWait as e:
+                        await bot.send_message(chat_id=chat_id, text=str(e))
+                        time.sleep(e.x)
+                else:
+                    show_text = f"**⥥ 📥 ＤＯＷＮＬＯＡＤＩＮＧ 📥 :-**\n\n**📝Name »** `{name}`\n❄𝐐𝐮𝐚𝐥𝐢𝐭𝐲 » 720p\n\n**Url :-** `Hidden`\n\n **Bot made by MR (Daddy)🧑🏻‍💻**"
+                    prog = await bot.send_message(chat_id=chat_id, text=show_text)
+                    
+                    # Download function assumed from helper
+                    filename = await helper.download_video(url, ytf, name)
+                    
+                    await prog.delete()
+                    await helper.send_vid(bot, chat_id, cc, filename, thumb, name)
+                    
+                    os.remove(filename)
+
+            except Exception as e:
+                await bot.send_message(chat_id=chat_id, text=f"**𝐖𝐚𝐭𝐜𝐡 𝐓𝐡𝐢𝐬 𝐎𝐧 𝐘𝐎𝐔𝐓𝐔𝐁𝐄 🙏**\n\n**{url}**\n\n**{cc}**")
+
+    except Exception as e:
+        await bot.send_message(chat_id=chat_id, text=str(e))
+
+    await bot.send_message(chat_id=chat_id, text="**Done✅**")
+
+# You must call process_and_send_content() inside your bot's event loop or a handler
+# Example usage:
+# await process_and_send_content("Testname:https://example.com/master.mpd", bot, chat_id)
+
+# bot.run() should be outside the function and run the Client
+bot.run()  # Uncomment and use when needed
+                                
