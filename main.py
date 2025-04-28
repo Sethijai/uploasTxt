@@ -29,7 +29,13 @@ from urllib.parse import urlparse, parse_qs
 from bs4 import BeautifulSoup
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger('PenPencilBot')
+if not logger.handlers:  # Only configure if no handlers exist
+    logger.setLevel(logging.INFO)
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+    logger.addHandler(console_handler)
+
 
 # PenPencil API credentials
 ACCESS_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3NDYzMzkwMzkuMDQ0LCJkYXRhIjp7Il9pZCI6IjY0YjY0NDhkNjAxYWM2MDAxOGQ5ODE1MyIsInVzZXJuYW1lIjoiOTM1MjYzMTczMSIsImZpcnN0TmFtZSI6Ik5hbWFuIiwibGFzdE5hbWUiOiIiLCJvcmdhbml6YXRpb24iOnsiX2lkIjoiNWViMzkzZWU5NWZhYjc0NjhhNzlkMTg5Iiwid2Vic2l0ZSI6InBoeXNpY3N3YWxsYWguY29tIiwibmFtZSI6IlBoeXNpY3N3YWxsYWgifSwiZW1haWwiOiJvcG1hc3Rlcjk4NTRAZ21haWwuY29tIiwicm9sZXMiOlsiNWIyN2JkOTY1ODQyZjk1MGE3NzhjNmVmIl0sImNvdW50cnlHcm91cCI6IklOIiwidHlwZSI6IlVTRVIifSwiaWF0IjoxNzQ1NzM0MjM5fQ.GNUr2USwCUeV7Y8gWsyIp3yuGnaSdrg7bbjkCBSdguI"  # Replace with your PenPencil API token
@@ -63,7 +69,7 @@ async def fetch_pwwp_data(session: aiohttp.ClientSession, url: str, headers: Dic
         if response.status == 200:
             return await response.json()
         else:
-            logging.warning(f"Failed to fetch data from {url}")
+            logger.warning(f"Failed to fetch data from {url}")
             return None
 
 async def get_pwwp_todays_schedule_content_details(session: aiohttp.ClientSession, selected_batch_id, subject_id, schedule_id, headers: Dict) -> List[str]:
@@ -104,7 +110,7 @@ async def get_pwwp_todays_schedule_content_details(session: aiohttp.ClientSessio
                         line = f"{name}: {url}"
                         content.append(line)
     else:
-        logging.warning(f"No Data Found For Schedule ID - {schedule_id}")
+        logger.warning(f"No Data Found For Schedule ID - {schedule_id}")
     return content
 
 async def get_pwwp_all_todays_schedule_content(session: aiohttp.ClientSession, selected_batch_id: str, headers: Dict) -> List[str]:
@@ -123,7 +129,7 @@ async def get_pwwp_all_todays_schedule_content(session: aiohttp.ClientSession, s
         for result in results:
             all_content.extend(result)
     else:
-        logging.warning("No today's schedule data found.")
+        logger.warning("No today's schedule data found.")
     return all_content
 
 async def process_and_send_content(content: str, bot: Client):
@@ -164,7 +170,7 @@ async def process_and_send_content(content: str, bot: Client):
                 )
                 os.remove(f'{name}.pdf')
             except Exception as e:
-                logging.error(f"Error downloading PDF {url}: {e}")
+                logger.error(f"Error downloading PDF {url}: {e}")
                 await bot.send_message(CHANNEL_ID, f"Failed to download PDF: {url}")
         elif "/master.m3u8" in url:
             try:
@@ -175,10 +181,10 @@ async def process_and_send_content(content: str, bot: Client):
                 await prog.delete(True)
                 await helper.send_vid(bot, None, cc, filename, thumb, name, prog)
             except Exception as e:
-                logging.error(f"Error processing video {url}: {e}")
+                logger.error(f"Error processing video {url}: {e}")
                 await bot.send_message(CHANNEL_ID, f"Failed to process video: {url}\n\n**{cc}**")
     except Exception as e:
-        logging.error(f"Error processing content {content}: {e}")
+        logger.error(f"Error processing content {content}: {e}")
         await bot.send_message(CHANNEL_ID, f"Error processing content: {content}")
 
 async def monitor_todays_schedule(bot: Client):
@@ -196,11 +202,11 @@ async def monitor_todays_schedule(bot: Client):
                         await process_and_send_content(item, bot)
                     seen_items.update(new_items)
                 else:
-                    logging.info(f"No new content. Checked at {datetime.now().strftime('%H:%M:%S')}")
+                    logger.info(f"No new content. Checked at {datetime.now().strftime('%H:%M:%S')}")
 
                 await asyncio.sleep(300)  # Check every 5 minutes (300 seconds)
             except Exception as e:
-                logging.error(f"Error occurred: {e}")
+                logger.error(f"Error occurred: {e}")
                 await bot.send_message(CHANNEL_ID, f"Error in monitoring: {e}")
                 await asyncio.sleep(300)  # Even if error, wait and retry
 
