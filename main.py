@@ -20,7 +20,7 @@ from pyrogram import Client, filters
 from p_bar import progress_bar                                                        
 from subprocess import getstatusoutput                                                        
 from aiohttp import ClientSession                                                        
-from logger import logging                                                        
+import logging as std_logging                                                        
 import time                                                                                                                
 from pyrogram.types import User, Message                                                        
 import sys                                                        
@@ -29,13 +29,27 @@ from urllib.parse import urlparse, parse_qs
 from bs4 import BeautifulSoup
 
 # Configure logging
-logger = logging.getLogger('PenPencilBot')
-if not logger.handlers:  # Only configure if no handlers exist
-    logger.setLevel(logging.INFO)
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
-    logger.addHandler(console_handler)
+print(f"Logging module: {std_logging.__file__}")
 
+# Configure logging with a custom logger to avoid conflicts
+try:
+    logger = std_logging.getLogger('PenPencilBot')
+    if not logger.handlers:  # Only configure if no handlers exist
+        logger.setLevel(std_logging.INFO)
+        console_handler = std_logging.StreamHandler()
+        console_handler.setFormatter(std_logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+        logger.addHandler(console_handler)
+except Exception as e:
+    # Fallback: Minimal console logging if getLogger fails
+    print(f"Failed to configure logging: {e}")
+    class FallbackLogger:
+        @staticmethod
+        def info(msg): print(f"INFO: {msg}")
+        @staticmethod
+        def warning(msg): print(f"WARNING: {msg}")
+        @staticmethod
+        def error(msg): print(f"ERROR: {msg}")
+    logger = FallbackLogger()
 
 # PenPencil API credentials
 ACCESS_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3NDYzMzkwMzkuMDQ0LCJkYXRhIjp7Il9pZCI6IjY0YjY0NDhkNjAxYWM2MDAxOGQ5ODE1MyIsInVzZXJuYW1lIjoiOTM1MjYzMTczMSIsImZpcnN0TmFtZSI6Ik5hbWFuIiwibGFzdE5hbWUiOiIiLCJvcmdhbml6YXRpb24iOnsiX2lkIjoiNWViMzkzZWU5NWZhYjc0NjhhNzlkMTg5Iiwid2Vic2l0ZSI6InBoeXNpY3N3YWxsYWguY29tIiwibmFtZSI6IlBoeXNpY3N3YWxsYWgifSwiZW1haWwiOiJvcG1hc3Rlcjk4NTRAZ21haWwuY29tIiwicm9sZXMiOlsiNWIyN2JkOTY1ODQyZjk1MGE3NzhjNmVmIl0sImNvdW50cnlHcm91cCI6IklOIiwidHlwZSI6IlVTRVIifSwiaWF0IjoxNzQ1NzM0MjM5fQ.GNUr2USwCUeV7Y8gWsyIp3yuGnaSdrg7bbjkCBSdguI"  # Replace with your PenPencil API token
