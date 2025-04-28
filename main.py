@@ -37,6 +37,7 @@ STOP_COMMAND = os.environ.get("STOPING", "Stop")
 ACCESS_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3NDYzMzkwMzkuMDQ0LCJkYXRhIjp7Il9pZCI6IjY0YjY0NDhkNjAxYWM2MDAxOGQ5ODE1MyIsInVzZXJuYW1lIjoiOTM1MjYzMTczMSIsImZpcnN0TmFtZSI6Ik5hbWFuIiwibGFzdE5hbWUiOiIiLCJvcmdhbml6YXRpb24iOnsiX2lkIjoiNWViMzkzZWU5NWZhYjc0NjhhNzlkMTg5Iiwid2Vic2l0ZSI6InBoeXNpY3N3YWxsYWguY29tIiwibmFtZSI6IlBoeXNpY3N3YWxsYWgifSwiZW1haWwiOiJvcG1hc3Rlcjk4NTRAZ21haWwuY29tIiwicm9sZXMiOlsiNWIyN2JkOTY1ODQyZjk1MGE3NzhjNmVmIl0sImNvdW50cnlHcm91cCI6IklOIiwidHlwZSI6IlVTRVIifSwiaWF0IjoxNzQ1NzM0MjM5fQ.GNUr2USwCUeV7Y8gWsyIp3yuGnaSdrg7bbjkCBSdguI"
 BATCH_ID = "67738e4a5787b05d8ec6e07f"
 
+thumb = "no"
 # PenPencil API headers
 HEADERS = {
     'Host': 'api.penpencil.co',
@@ -129,8 +130,7 @@ async def process_and_send_content(content: str, bot: Client, chat_id: str):
         name, url = content.split(":", 1)
         name = name.strip()
         url = url.strip()
-                                                        
-thumb == "no"                                                
+                                                                                                        
                                                         
             if '/master.mpd' in url:                                                        
              id =  url.split("/")[-2]                                                        
