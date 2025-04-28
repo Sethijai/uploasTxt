@@ -21,14 +21,16 @@ import sys
 import tempfile
 from urllib.parse import urlparse, parse_qs
 from bs4 import BeautifulSoup
+import pyrogram
 
 # Configure logging
 print(f"Logging module: {std_logging.__file__}")
+print(f"Pyrogram version: {pyrogram.__version__}")
 
 try:
     logger = std_logging.getLogger('PenPencilBot')
     if not logger.handlers:
-        logger.setLevel(std_logging.DEBUG)  # Set to DEBUG for detailed logging
+        logger.setLevel(std_logging.DEBUG)
         console_handler = std_logging.StreamHandler()
         console_handler.setFormatter(std_logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
         logger.addHandler(console_handler)
@@ -209,20 +211,25 @@ async def monitor_todays_schedule(bot: Client, chat_id: str):
                 else:
                     logger.debug(f"No new content. Checked at {datetime.now().strftime('%H:%M:%S')}")
 
-                await asyncio.sleep(300)  # Check every 5 minutes
+                await asyncio.sleep(300)
             except Exception as e:
                 logger.error(f"Error occurred in monitoring for chat {chat_id}: {e}")
                 await bot.send_message(chat_id, f"Error in monitoring: {e}")
                 await asyncio.sleep(300)
 
-# Handler for /start command to test responsiveness
+# Catch-all message handler to debug incoming messages
+@bot.on_message()
+async def catch_all_messages(client: Client, message: Message):
+    logger.debug(f"Received message in chat {message.chat.id}: {message.text or 'No text'}")
+
+# Handler for /start command
 @bot.on_message(filters.command("start") & filters.private)
 async def start_command(client: Client, message: Message):
     chat_id = str(message.chat.id)
     logger.debug(f"Received /start command in private chat {chat_id}")
     await message.reply("Bot is running! Use /now to start monitoring.")
 
-# Handler for /now command in private chat
+# Handler for /now command
 @bot.on_message(filters.command("now") & filters.private)
 async def start_monitoring(client: Client, message: Message):
     chat_id = str(message.chat.id)
@@ -240,7 +247,7 @@ async def start_monitoring(client: Client, message: Message):
         logger.error(f"Error starting monitoring for chat {chat_id}: {e}")
         await client.send_message(chat_id, f"Failed to start monitoring: {e}")
 
-# Health check to verify Telegram API connectivity
+# Health check
 async def health_check(bot: Client):
     while True:
         try:
@@ -248,7 +255,7 @@ async def health_check(bot: Client):
             logger.debug(f"Health check: Bot is connected as @{me.username}")
         except Exception as e:
             logger.error(f"Health check failed: {e}")
-        await asyncio.sleep(600)  # Check every 10 minutes
+        await asyncio.sleep(600)
 
 async def main():
     try:
@@ -261,10 +268,9 @@ async def main():
         await bot.start()
         logger.info("Bot started successfully.")
 
-        # Start health check
         asyncio.create_task(health_check(bot))
 
-        await asyncio.Event().wait()  # Keep the bot running
+        await asyncio.Event().wait()
     except Exception as e:
         logger.error(f"Startup error: {e}")
         print(f"ERROR: Startup failed: {e}")
