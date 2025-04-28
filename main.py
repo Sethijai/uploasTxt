@@ -1,4 +1,5 @@
-from pyrogram.errors.exceptions.bad_request_400 import StickerEmojiInvalid                                                        
+from pyrogram.errors.exceptions.bad_request_400 import StickerEmojiInvalid  
+from typing import Dict, List
 import requests                                                        
 import json                                                        
 import subprocess                                                        
