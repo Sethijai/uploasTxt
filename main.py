@@ -32,8 +32,8 @@ from bs4 import BeautifulSoup
 logging.basicConfig(level=logging.INFO)
 
 # PenPencil API credentials
-ACCESS_TOKEN = "your_access_token_here"  # Replace with your PenPencil API token
-BATCH_ID = "your_batch_id_here"  # Replace with your batch ID
+ACCESS_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3NDYzMzkwMzkuMDQ0LCJkYXRhIjp7Il9pZCI6IjY0YjY0NDhkNjAxYWM2MDAxOGQ5ODE1MyIsInVzZXJuYW1lIjoiOTM1MjYzMTczMSIsImZpcnN0TmFtZSI6Ik5hbWFuIiwibGFzdE5hbWUiOiIiLCJvcmdhbml6YXRpb24iOnsiX2lkIjoiNWViMzkzZWU5NWZhYjc0NjhhNzlkMTg5Iiwid2Vic2l0ZSI6InBoeXNpY3N3YWxsYWguY29tIiwibmFtZSI6IlBoeXNpY3N3YWxsYWgifSwiZW1haWwiOiJvcG1hc3Rlcjk4NTRAZ21haWwuY29tIiwicm9sZXMiOlsiNWIyN2JkOTY1ODQyZjk1MGE3NzhjNmVmIl0sImNvdW50cnlHcm91cCI6IklOIiwidHlwZSI6IlVTRVIifSwiaWF0IjoxNzQ1NzM0MjM5fQ.GNUr2USwCUeV7Y8gWsyIp3yuGnaSdrg7bbjkCBSdguI"  # Replace with your PenPencil API token
+BATCH_ID = "67738e4a5787b05d8ec6e07f"  # Replace with your batch ID
 
 # PenPencil API headers
 HEADERS = {
@@ -147,7 +147,7 @@ async def process_and_send_content(content: str, bot: Client):
         # Handle MPD URLs
         if '/master.mpd' in url:
             id = url.split("/")[-2]
-            url = f"https://madxapi-d0cbf6ac738c.herokuapp.com/{id}/master.m3u8&token={ACCESS_TOKEN}"
+            url = f"https://as-multiverse-b0b2769da88f.herokuapp.com/{id}/master.m3u8?token={ACCESS_TOKEN}"
 
         # Hardcode thumbnail (or use a default one)
         thumb = "no"  # Replace with a default thumbnail URL or path if needed
