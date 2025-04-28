@@ -224,25 +224,37 @@ async def monitor_todays_schedule(bot: Client):
                 await bot.send_message(CHANNEL_ID, f"Error in monitoring: {e}")
                 await asyncio.sleep(300)  # Even if error, wait and retry
 
-async def main():
+async def main(loop: asyncio.AbstractEventLoop):
     async with bot:
         try:
-            # Resolve the channel peer to ensure it's valid
-            await bot.resolve_peer(CHANNEL_ID)
+            # Retry peer resolution up to 3 times
+            for attempt in range(3):
+                try:
+                    await bot.resolve_peer(CHANNEL_ID)
+                    break
+                except PeerIdInvalid as e:
+                    logger.warning(f"Peer resolution attempt {attempt + 1} failed: {e}")
+                    if attempt == 2:
+                        logger.error(f"Invalid CHANNEL_ID: {CHANNEL_ID}. Ensure the bot is an admin in the channel.")
+                        raise PeerIdInvalid(f"Invalid CHANNEL_ID: {CHANNEL_ID}. Add the bot as an admin and verify the ID.")
+                    await asyncio.sleep(2)  # Wait before retrying
             await bot.send_message(CHANNEL_ID, "Bot started monitoring for new content.")
             await monitor_todays_schedule(bot)
-        except PeerIdInvalid:
-            logger.error(f"Invalid CHANNEL_ID: {CHANNEL_ID}. Ensure the bot is an admin in the channel.")
-            print(f"ERROR: Invalid CHANNEL_ID: {CHANNEL_ID}. Add the bot as an admin and verify the ID.")
-            raise
         except Exception as e:
             logger.error(f"Startup error: {e}")
             print(f"ERROR: Startup failed: {e}")
             raise
+        finally:
+            await bot.stop()  # Ensure clean shutdown
 
 if __name__ == "__main__":
+    # Explicitly create and manage the event loop
+    loop = asyncio.get_event_loop()
     try:
-        asyncio.run(main())
+        loop.run_until_complete(main(loop))
     except Exception as e:
         print(f"Main loop error: {e}")
         logger.error(f"Main loop error: {e}")
+    finally:
+        loop.run_until_complete(loop.shutdown_asyncgens())
+        loop.close()
