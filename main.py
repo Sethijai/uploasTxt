@@ -72,8 +72,8 @@ bot = Client(
     api_hash=os.environ.get("API_HASH", "2daa157943cb2d76d149c4de0b036a99")
 )
 
-# Destination chat ID for sending content (replace with your group/channel ID or use message.chat.id)
-DESTINATION_CHAT_ID = "5487643307"  # Example: Replace with your chat ID
+# Destination chat ID for sending content
+DESTINATION_CHAT_ID = "5487643307"  # Replace with your chat ID
 
 async def fetch_pwwp_data(session: aiohttp.ClientSession, url: str, headers: Dict):
     async with session.get(url, headers=headers) as response:
@@ -215,6 +215,13 @@ async def monitor_todays_schedule(bot: Client, chat_id: str):
                 await bot.send_message(chat_id, f"Error in monitoring: {e}")
                 await asyncio.sleep(300)
 
+# Handler for /start command to test responsiveness
+@bot.on_message(filters.command("start") & filters.private)
+async def start_command(client: Client, message: Message):
+    chat_id = str(message.chat.id)
+    logger.debug(f"Received /start command in private chat {chat_id}")
+    await message.reply("Bot is running! Use /now to start monitoring.")
+
 # Handler for /now command in private chat
 @bot.on_message(filters.command("now") & filters.private)
 async def start_monitoring(client: Client, message: Message):
@@ -222,33 +229,41 @@ async def start_monitoring(client: Client, message: Message):
     logger.debug(f"Received /now command in private chat {chat_id}")
     
     try:
-        # Use DESTINATION_CHAT_ID for sending content
-        destination_chat = DESTINATION_CHAT_ID  # Can be changed to chat_id for private chat
+        destination_chat = DESTINATION_CHAT_ID
         logger.debug(f"Monitoring will send content to chat {destination_chat}")
 
-        # Confirm command receipt
         await client.send_message(chat_id, f"Bot started monitoring. Content will be sent to chat {destination_chat}.")
         logger.info(f"Started monitoring for destination chat {destination_chat}")
 
-        # Start monitoring
         asyncio.create_task(monitor_todays_schedule(client, destination_chat))
     except Exception as e:
         logger.error(f"Error starting monitoring for chat {chat_id}: {e}")
         await client.send_message(chat_id, f"Failed to start monitoring: {e}")
 
+# Health check to verify Telegram API connectivity
+async def health_check(bot: Client):
+    while True:
+        try:
+            me = await bot.get_me()
+            logger.debug(f"Health check: Bot is connected as @{me.username}")
+        except Exception as e:
+            logger.error(f"Health check failed: {e}")
+        await asyncio.sleep(600)  # Check every 10 minutes
+
 async def main():
     try:
-        # Log initial state
         logger.info(f"Bot initialized: {bot.is_initialized}, Connected: {bot.is_connected}")
 
-        # If the bot is already connected, stop it first
         if bot.is_connected:
             logger.info("Bot is already connected. Stopping existing session.")
             await bot.stop()
 
-        # Start the bot
         await bot.start()
         logger.info("Bot started successfully.")
+
+        # Start health check
+        asyncio.create_task(health_check(bot))
+
         await asyncio.Event().wait()  # Keep the bot running
     except Exception as e:
         logger.error(f"Startup error: {e}")
@@ -260,7 +275,6 @@ async def main():
             logger.info("Bot stopped successfully.")
 
 if __name__ == "__main__":
-    # Create a new event loop
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     try:
