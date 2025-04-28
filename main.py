@@ -57,9 +57,7 @@ HEADERS = {
     'Host': 'api.penpencil.co',
     'client-id': '5eb393ee95fab7468a79d189',
     'client-version': '1910',
-    'user-agent': 'Mozilla/5.0 (Linux; Android 12; M2101K6P) Apple
-
-WebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36',
+    'user-agent': 'Mozilla/5.0 (Linux; Android 12; M2101K6P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36',
     'randomid': '72012511-256c-4e1c-b4c7-29d67136af37',
     'client-type': 'WEB',
     'content-type': 'application/json; charset=utf-8',
