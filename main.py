@@ -226,8 +226,23 @@ async def monitor_todays_schedule(bot: Client):
 
 async def main():
     async with bot:
-        await bot.send_message(CHANNEL_ID, "Bot started monitoring for new content.")
-        await monitor_todays_schedule(bot)
+        try:
+            # Resolve the channel peer to ensure it's valid
+            await bot.resolve_peer(CHANNEL_ID)
+            await bot.send_message(CHANNEL_ID, "Bot started monitoring for new content.")
+            await monitor_todays_schedule(bot)
+        except PeerIdInvalid:
+            logger.error(f"Invalid CHANNEL_ID: {CHANNEL_ID}. Ensure the bot is an admin in the channel.")
+            print(f"ERROR: Invalid CHANNEL_ID: {CHANNEL_ID}. Add the bot as an admin and verify the ID.")
+            raise
+        except Exception as e:
+            logger.error(f"Startup error: {e}")
+            print(f"ERROR: Startup failed: {e}")
+            raise
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        print(f"Main loop error: {e}")
+        logger.error(f"Main loop error: {e}")
