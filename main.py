@@ -56,7 +56,7 @@ bot = Client(
 )
 
 # Telegram channel ID (replace with your channel's chat ID, e.g., @YourChannel or -100123456789)
-CHANNEL_ID = "your_channel_id_here"
+CHANNEL_ID = "-1002020004405"
 
 async def fetch_pwwp_data(session: aiohttp.ClientSession, url: str, headers: Dict):
     async with session.get(url, headers=headers) as response:
