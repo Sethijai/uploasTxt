@@ -28,16 +28,14 @@ from bs4 import BeautifulSoup
 # Configure logging
 print(f"Logging module: {std_logging.__file__}")
 
-# Configure logging with a custom logger to avoid conflicts
 try:
     logger = std_logging.getLogger('PenPencilBot')
-    if not logger.handlers:  # Only configure if no handlers exist
+    if not logger.handlers:
         logger.setLevel(std_logging.INFO)
         console_handler = std_logging.StreamHandler()
         console_handler.setFormatter(std_logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
         logger.addHandler(console_handler)
 except Exception as e:
-    # Fallback: Minimal console logging if getLogger fails
     print(f"Failed to configure logging: {e}")
     class FallbackLogger:
         @staticmethod
@@ -49,8 +47,8 @@ except Exception as e:
     logger = FallbackLogger()
 
 # PenPencil API credentials
-ACCESS_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3NDYzMzkwMzkuMDQ0LCJkYXRhIjp7Il9pZCI6IjY0YjY0NDhkNjAxYWM2MDAxOGQ5ODE1MyIsInVzZXJuYW1lIjoiOTM1MjYzMTczMSIsImZpcnN0TmFtZSI6Ik5hbWFuIiwibGFzdE5hbWUiOiIiLCJvcmdhbml6YXRpb24iOnsiX2lkIjoiNWViMzkzZWU5NWZhYjc0NjhhNzlkMTg5Iiwid2Vic2l0ZSI6InBoeXNpY3N3YWxsYWguY29tIiwibmFtZSI6IlBoeXNpY3N3YWxsYWgifSwiZW1haWwiOiJvcG1hc3Rlcjk4NTRAZ21haWwuY29tIiwicm9sZXMiOlsiNWIyN2JkOTY1ODQyZjk1MGE3NzhjNmVmIl0sImNvdW50cnlHcm91cCI6IklOIiwidHlwZSI6IlVTRVIifSwiaWF0IjoxNzQ1NzM0MjM5fQ.GNUr2USwCUeV7Y8gWsyIp3yuGnaSdrg7bbjkCBSdguI"  # Replace with your PenPencil API token
-BATCH_ID = "67738e4a5787b05d8ec6e07f"  # Replace with your batch ID
+ACCESS_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3NDYzMzkwMzkuMDQ0LCJkYXRhIjp7Il9pZCI6IjY0YjY0NDhkNjAxYWM2MDAxOGQ5ODE1MyIsInVzZXJuYW1lIjoiOTM1MjYzMTczMSIsImZpcnN0TmFtZSI6Ik5hbWFuIiwibGFzdE5hbWUiOiIiLCJvcmdhbml6YXRpb24iOnsiX2lkIjoiNWViMzkzZWU5NWZhYjc0NjhhNzlkMTg5Iiwid2Vic2l0ZSI6InBoeXNpY3N3YWxsYWguY29tIiwibmFtZSI6IlBoeXNpY3N3YWxsYWgifSwiZW1haWwiOiJvcG1hc3Rlcjk4NTRAZ21haWwuY29tIiwicm9sZXMiOlsiNWIyN2JkOTY1ODQyZjk1MGE3NzhjNmVmIl0sImNvdW50cnlHcm91cCI6IklOIiwidHlwZSI6IlVTRVIifSwiaWF0IjoxNzQ1NzM0MjM5fQ.GNUr2USwCUeV7Y8gWsyIp3yuGnaSdrg7bbjkCBSdguI"
+BATCH_ID = "67738e4a5787b05d8ec6e07f"
 
 # PenPencil API headers
 HEADERS = {
@@ -142,29 +140,23 @@ async def get_pwwp_all_todays_schedule_content(session: aiohttp.ClientSession, s
 
 async def process_and_send_content(content: str, bot: Client, chat_id: str):
     try:
-        # Parse content (format: "name: url")
         name, url = content.split(":", 1)
         name = name.strip()
         url = url.strip()
 
-        # Clean name for filename
         name1 = name.replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "@").replace("*", "").replace("https", "").replace("http", "").strip()
         name = f'{name1[:60]}'
 
-        # Prepare captions
         cc = f'**{name1}.mkv**\n\n**𝗕𝗮𝘁𝗰𝗵 - OP**'
         cc1 = f'**{name1}.pdf**\n\n**𝗕𝗮𝘁𝗰𝗵 - OP**'
 
-        # Set YouTube format (though not used for MPD/PDF)
         ytf = f"b[height<=720]/bv[height<=720]+ba/b/bv+ba"
 
-        # Handle MPD URLs
         if '/master.mpd' in url:
             id = url.split("/")[-2]
             url = f"https://as-multiverse-b0b2769da88f.herokuapp.com/{id}/master.m3u8?token={ACCESS_TOKEN}"
 
-        # Hardcode thumbnail (or use a default one)
-        thumb = "no"  # Replace with a default thumbnail URL or path if needed
+        thumb = "no"
 
         if ".pdf" in url:
             try:
@@ -212,18 +204,17 @@ async def monitor_todays_schedule(bot: Client, chat_id: str):
                 else:
                     logger.info(f"No new content. Checked at {datetime.now().strftime('%H:%M:%S')}")
 
-                await asyncio.sleep(300)  # Check every 5 minutes (300 seconds)
+                await asyncio.sleep(300)
             except Exception as e:
                 logger.error(f"Error occurred: {e}")
                 await bot.send_message(chat_id, f"Error in monitoring: {e}")
-                await asyncio.sleep(300)  # Even if error, wait and retry
+                await asyncio.sleep(300)
 
 # Handler for /now command
 @bot.on_message(filters.command("now") & filters.chat(filters.channel))
 async def start_monitoring(client: Client, message: Message):
     chat_id = str(message.chat.id)
     try:
-        # Check if the bot is an admin in the channel
         chat = await client.get_chat(chat_id)
         admins = await chat.get_members(filter="administrators")
         bot_id = (await client.get_me()).id
@@ -233,10 +224,8 @@ async def start_monitoring(client: Client, message: Message):
             await client.send_message(chat_id, "Please make me an admin in this channel to proceed.")
             return
 
-        # Resolve peer to ensure the chat is accessible
         await client.resolve_peer(chat_id)
 
-        # Send confirmation and start monitoring
         await client.send_message(chat_id, "Bot started monitoring for new content in this channel.")
         asyncio.create_task(monitor_todays_schedule(client, chat_id))
     except PeerIdInvalid:
@@ -245,27 +234,35 @@ async def start_monitoring(client: Client, message: Message):
         logger.error(f"Error starting monitoring for chat {chat_id}: {e}")
         await client.send_message(chat_id, f"Failed to start monitoring: {e}")
 
-async def main(loop: asyncio.AbstractEventLoop):
-    async with bot:
-        try:
+async def main():
+    try:
+        # Check if the client is already running
+        if bot.is_initialized and not bot.is_connected:
             await bot.start()
             logger.info("Bot started successfully.")
             await asyncio.Event().wait()  # Keep the bot running
-        except Exception as e:
-            logger.error(f"Startup error: {e}")
-            print(f"ERROR: Startup failed: {e}")
-            raise
-        finally:
-            await bot.stop()  # Ensure clean shutdown
+        else:
+            logger.warning("Bot is already running or in an invalid state.")
+    except Exception as e:
+        logger.error(f"Startup error: {e}")
+        print(f"ERROR: Startup failed: {e}")
+        raise
+    finally:
+        if bot.is_connected:
+            await bot.stop()
+            logger.info("Bot stopped successfully.")
 
 if __name__ == "__main__":
-    # Explicitly create and manage the event loop
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     try:
-        loop.run_until_complete(main(loop))
+        loop.run_until_complete(main())
+    except KeyboardInterrupt:
+        logger.info("Bot terminated by user.")
     except Exception as e:
-        print(f"Main loop error: {e}")
         logger.error(f"Main loop error: {e}")
+        print(f"Main loop error: {e}")
     finally:
         loop.run_until_complete(loop.shutdown_asyncgens())
         loop.close()
+        logger.info("Event loop closed.")
