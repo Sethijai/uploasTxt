@@ -2,7 +2,7 @@ import asyncio
 import aiohttp
 from typing import Dict, List
 from datetime import datetime
-from pyrogram.errors import FloodWait, PeerIdInvalid
+from pyrogram.errors import FloodWait
 import os
 import re
 import subprocess
@@ -11,15 +11,12 @@ from pyrogram.errors.exceptions.bad_request_400 import StickerEmojiInvalid
 import requests
 import json
 from pyrogram import Client, filters
-from pyrogram.types.messages_and_media import message
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from pyrogram.types import Message
 from p_bar import progress_bar
 from subprocess import getstatusoutput
 from aiohttp import ClientSession
 import logging as std_logging
 import time
-from pyrogram.types import User, Message
 import sys
 import tempfile
 from urllib.parse import urlparse, parse_qs
@@ -31,11 +28,10 @@ print(f"Logging module: {std_logging.__file__}")
 try:
     logger = std_logging.getLogger('PenPencilBot')
     if not logger.handlers:
-        logger.setLevel(std_logging.DEBUG)  # Set to DEBUG for more detailed logs
+        logger.setLevel(std_logging.DEBUG)  # Set to DEBUG for detailed logging
         console_handler = std_logging.StreamHandler()
         console_handler.setFormatter(std_logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
         logger.addHandler(console_handler)
-        # Add file handler for persistent logging
         file_handler = std_logging.FileHandler('bot.log')
         file_handler.setFormatter(std_logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
         logger.addHandler(file_handler)
@@ -75,6 +71,9 @@ bot = Client(
     api_id=int(os.environ.get("API_ID", "23713783")),
     api_hash=os.environ.get("API_HASH", "2daa157943cb2d76d149c4de0b036a99")
 )
+
+# Destination chat ID for sending content (replace with your group/channel ID or use message.chat.id)
+DESTINATION_CHAT_ID = "5487643307"  # Example: Replace with your chat ID
 
 async def fetch_pwwp_data(session: aiohttp.ClientSession, url: str, headers: Dict):
     async with session.get(url, headers=headers) as response:
@@ -154,7 +153,7 @@ async def process_and_send_content(content: str, bot: Client, chat_id: str):
         name = f'{name1[:60]}'
 
         cc = f'**{name1}.mkv**\n\n**𝗕𝗮𝘁𝗰𝗵 - OP**'
-        cc1 = f'**{name1}.pdf**\n\n**𝗕𝗮𝘁�.c - OP**'
+        cc1 = f'**{name1}.pdf**\n\n**𝗕𝗮𝘁𝗰𝗵 - OP**'
 
         ytf = f"b[height<=720]/bv[height<=720]+ba/b/bv+ba"
 
@@ -210,57 +209,29 @@ async def monitor_todays_schedule(bot: Client, chat_id: str):
                 else:
                     logger.debug(f"No new content. Checked at {datetime.now().strftime('%H:%M:%S')}")
 
-                await asyncio.sleep(300)
+                await asyncio.sleep(300)  # Check every 5 minutes
             except Exception as e:
                 logger.error(f"Error occurred in monitoring for chat {chat_id}: {e}")
                 await bot.send_message(chat_id, f"Error in monitoring: {e}")
                 await asyncio.sleep(300)
 
-# Handler for /now command
-@bot.on_message(filters.command("now"))
+# Handler for /now command in private chat
+@bot.on_message(filters.command("now") & filters.private)
 async def start_monitoring(client: Client, message: Message):
     chat_id = str(message.chat.id)
-    logger.debug(f"Received /now command in chat {chat_id}")
+    logger.debug(f"Received /now command in private chat {chat_id}")
     
     try:
-        # Check if the chat is a channel
-        chat = await client.get_chat(chat_id)
-        if chat.type not in ["channel", "supergroup"]:
-            logger.debug(f"Chat {chat_id} is not a channel or supergroup, ignoring command")
-            await client.send_message(chat_id, "This command can only be used in channels or supergroups.")
-            return
+        # Use DESTINATION_CHAT_ID for sending content
+        destination_chat = DESTINATION_CHAT_ID  # Can be changed to chat_id for private chat
+        logger.debug(f"Monitoring will send content to chat {destination_chat}")
 
-        # Check if the bot is a member of the channel
-        try:
-            bot_member = await chat.get_member((await client.get_me()).id)
-            logger.debug(f"Bot member status in {chat_id}: {bot_member.status}")
-        except Exception as e:
-            logger.error(f"Bot is not a member of chat {chat_id}: {e}")
-            await client.send_message(chat_id, "Please add me to this channel to proceed.")
-            return
-
-        # Check if the bot is an admin
-        admins = await chat.get_members(filter="administrators")
-        bot_id = (await client.get_me()).id
-        is_admin = any(admin.user.id == bot_id for admin in admins)
-        logger.debug(f"Bot admin status in {chat_id}: {is_admin}")
-
-        if not is_admin:
-            logger.debug(f"Bot is not an admin in {chat_id}")
-            await client.send_message(chat_id, "Please make me an admin in this channel to proceed.")
-            return
-
-        # Resolve peer to ensure access
-        await client.resolve_peer(chat_id)
-        logger.debug(f"Successfully resolved peer for chat {chat_id}")
+        # Confirm command receipt
+        await client.send_message(chat_id, f"Bot started monitoring. Content will be sent to chat {destination_chat}.")
+        logger.info(f"Started monitoring for destination chat {destination_chat}")
 
         # Start monitoring
-        await client.send_message(chat_id, "Bot started monitoring for new content in this channel.")
-        logger.info(f"Started monitoring for chat {chat_id}")
-        asyncio.create_task(monitor_todays_schedule(client, chat_id))
-    except PeerIdInvalid as e:
-        logger.error(f"PeerIdInvalid for chat {chat_id}: {e}")
-        await client.send_message(chat_id, "Invalid channel ID or the bot does not have access. Please ensure the bot is added to the channel.")
+        asyncio.create_task(monitor_todays_schedule(client, destination_chat))
     except Exception as e:
         logger.error(f"Error starting monitoring for chat {chat_id}: {e}")
         await client.send_message(chat_id, f"Failed to start monitoring: {e}")
