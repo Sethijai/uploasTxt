@@ -57,13 +57,19 @@ async def restart_handler(_, m):
     os.execl(sys.executable, sys.executable, *sys.argv)
 
 @bot.on_message(filters.command([OP_COMMAND]))
-async def fetch_pwwp_data(session: aiohttp.ClientSession, url: str, headers: Dict):
-    async with session.get(url, headers=HEADERS) as response:
-        if response.status == 200:
-            return await response.json()
-        else:
-            logger.warning(f"Failed to fetch data from {url}")
-            return None
+async def fetch_pwwp_data(client, message):
+    # Extract URL from the message (assuming it's passed as a command argument)
+    url = message.text.split(" ")[1]  # This assumes the URL comes after the command
+    headers = HEADERS  # Use the global headers
+    
+    # Fetch data using aiohttp
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers) as response:
+            if response.status == 200:
+                return await response.json()
+            else:
+                logger.warning(f"Failed to fetch data from {url}")
+                return None
 
 async def get_pwwp_todays_schedule_content_details(session: aiohttp.ClientSession, selected_batch_id, subject_id, schedule_id, headers: Dict) -> List[str]:
     url = f"https://api.penpencil.co/v1/batches/{selected_batch_id}/subject/{subject_id}/schedule/{schedule_id}/schedule-details"
