@@ -13,8 +13,7 @@ import json
 from pyrogram import Client, filters                   
 from pyrogram.types.messages_and_media import message                                                        
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup                                                
-from pyrogram.errors import FloodWait, PeerIdInvalid                                                       
-from pyromod import listen                                                        
+from pyrogram.errors import FloodWait, PeerIdInvalid                                                                                                               
 from pyrogram.types import Message                                                        
 from pyrogram import Client, filters                                                        
 from p_bar import progress_bar                                                        
