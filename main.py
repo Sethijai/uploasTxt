@@ -31,10 +31,14 @@ print(f"Logging module: {std_logging.__file__}")
 try:
     logger = std_logging.getLogger('PenPencilBot')
     if not logger.handlers:
-        logger.setLevel(std_logging.INFO)
+        logger.setLevel(std_logging.DEBUG)  # Set to DEBUG for more detailed logs
         console_handler = std_logging.StreamHandler()
         console_handler.setFormatter(std_logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
         logger.addHandler(console_handler)
+        # Add file handler for persistent logging
+        file_handler = std_logging.FileHandler('bot.log')
+        file_handler.setFormatter(std_logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+        logger.addHandler(file_handler)
 except Exception as e:
     print(f"Failed to configure logging: {e}")
     class FallbackLogger:
@@ -44,6 +48,8 @@ except Exception as e:
         def warning(msg): print(f"WARNING: {msg}")
         @staticmethod
         def error(msg): print(f"ERROR: {msg}")
+        @staticmethod
+        def debug(msg): print(f"DEBUG: {msg}")
     logger = FallbackLogger()
 
 # PenPencil API credentials
@@ -148,7 +154,7 @@ async def process_and_send_content(content: str, bot: Client, chat_id: str):
         name = f'{name1[:60]}'
 
         cc = f'**{name1}.mkv**\n\n**𝗕𝗮𝘁𝗰𝗵 - OP**'
-        cc1 = f'**{name1}.pdf**\n\n**𝗕𝗮𝘁𝗰𝗵 - OP**'
+        cc1 = f'**{name1}.pdf**\n\n**𝗕𝗮𝘁�.c - OP**'
 
         ytf = f"b[height<=720]/bv[height<=720]+ba/b/bv+ba"
 
@@ -202,33 +208,58 @@ async def monitor_todays_schedule(bot: Client, chat_id: str):
                         await process_and_send_content(item, bot, chat_id)
                     seen_items.update(new_items)
                 else:
-                    logger.info(f"No new content. Checked at {datetime.now().strftime('%H:%M:%S')}")
+                    logger.debug(f"No new content. Checked at {datetime.now().strftime('%H:%M:%S')}")
 
                 await asyncio.sleep(300)
             except Exception as e:
-                logger.error(f"Error occurred: {e}")
+                logger.error(f"Error occurred in monitoring for chat {chat_id}: {e}")
                 await bot.send_message(chat_id, f"Error in monitoring: {e}")
                 await asyncio.sleep(300)
 
 # Handler for /now command
-@bot.on_message(filters.command("now") & filters.chat(filters.channel))
+@bot.on_message(filters.command("now"))
 async def start_monitoring(client: Client, message: Message):
     chat_id = str(message.chat.id)
+    logger.debug(f"Received /now command in chat {chat_id}")
+    
     try:
+        # Check if the chat is a channel
         chat = await client.get_chat(chat_id)
+        if chat.type not in ["channel", "supergroup"]:
+            logger.debug(f"Chat {chat_id} is not a channel or supergroup, ignoring command")
+            await client.send_message(chat_id, "This command can only be used in channels or supergroups.")
+            return
+
+        # Check if the bot is a member of the channel
+        try:
+            bot_member = await chat.get_member((await client.get_me()).id)
+            logger.debug(f"Bot member status in {chat_id}: {bot_member.status}")
+        except Exception as e:
+            logger.error(f"Bot is not a member of chat {chat_id}: {e}")
+            await client.send_message(chat_id, "Please add me to this channel to proceed.")
+            return
+
+        # Check if the bot is an admin
         admins = await chat.get_members(filter="administrators")
         bot_id = (await client.get_me()).id
         is_admin = any(admin.user.id == bot_id for admin in admins)
+        logger.debug(f"Bot admin status in {chat_id}: {is_admin}")
 
         if not is_admin:
+            logger.debug(f"Bot is not an admin in {chat_id}")
             await client.send_message(chat_id, "Please make me an admin in this channel to proceed.")
             return
 
+        # Resolve peer to ensure access
         await client.resolve_peer(chat_id)
+        logger.debug(f"Successfully resolved peer for chat {chat_id}")
 
+        # Start monitoring
         await client.send_message(chat_id, "Bot started monitoring for new content in this channel.")
+        logger.info(f"Started monitoring for chat {chat_id}")
         asyncio.create_task(monitor_todays_schedule(client, chat_id))
-    except PeerIdInvalid:
+    except PeerIdInvalid as e:
+        logger.error(f"PeerIdInvalid for chat {chat_id}: {e}")
         await client.send_message(chat_id, "Invalid channel ID or the bot does not have access. Please ensure the bot is added to the channel.")
     except Exception as e:
         logger.error(f"Error starting monitoring for chat {chat_id}: {e}")
@@ -244,13 +275,10 @@ async def main():
             logger.info("Bot is already connected. Stopping existing session.")
             await bot.stop()
 
-        # Start the bot if not already initialized
-        if not bot.is_initialized or not bot.is_connected:
-            await bot.start()
-            logger.info("Bot started successfully.")
-            await asyncio.Event().wait()  # Keep the bot running
-        else:
-            logger.warning("Bot is in an unexpected state. Cannot start.")
+        # Start the bot
+        await bot.start()
+        logger.info("Bot started successfully.")
+        await asyncio.Event().wait()  # Keep the bot running
     except Exception as e:
         logger.error(f"Startup error: {e}")
         print(f"ERROR: Startup failed: {e}")
