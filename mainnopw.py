@@ -33,6 +33,21 @@ bot = Client("bot",
 
 OP_COMMAND = os.environ.get("COMMAND", "op")
 STOP_COMMAND = os.environ.get("STOPING", "Stop")
+
+ACCESS_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3NDYzMzkwMzkuMDQ0LCJkYXRhIjp7Il9pZCI6IjY0YjY0NDhkNjAxYWM2MDAxOGQ5ODE1MyIsInVzZXJuYW1lIjoiOTM1MjYzMTczMSIsImZpcnN0TmFtZSI6Ik5hbWFuIiwibGFzdE5hbWUiOiIiLCJvcmdhbml6YXRpb24iOnsiX2lkIjoiNWViMzkzZWU5NWZhYjc0NjhhNzlkMTg5Iiwid2Vic2l0ZSI6InBoeXNpY3N3YWxsYWguY29tIiwibmFtZSI6IlBoeXNpY3N3YWxsYWgifSwiZW1haWwiOiJvcG1hc3Rlcjk4NTRAZ21haWwuY29tIiwicm9sZXMiOlsiNWIyN2JkOTY1ODQyZjk1MGE3NzhjNmVmIl0sImNvdW50cnlHcm91cCI6IklOIiwidHlwZSI6IlVTRVIifSwiaWF0IjoxNzQ1NzM0MjM5fQ.GNUr2USwCUeV7Y8gWsyIp3yuGnaSdrg7bbjkCBSdguI"
+BATCH_ID = "67738e4a5787b05d8ec6e07f"
+
+# PenPencil API headers
+HEADERS = {
+    'Host': 'api.penpencil.co',
+    'client-id': '5eb393ee95fab7468a79d189',
+    'client-version': '1910',
+    'user-agent': 'Mozilla/5.0 (Linux; Android 12; M2101K6P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36',
+    'randomid': '72012511-256c-4e1c-b4c7-29d67136af37',
+    'client-type': 'WEB',
+    'content-type': 'application/json; charset=utf-8',
+    'authorization': f"Bearer {ACCESS_TOKEN}",
+}
                                                         
                                                         
 @bot.on_message(filters.command([STOP_COMMAND]))                                                        
