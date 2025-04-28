@@ -2,27 +2,25 @@ import asyncio
 import aiohttp
 from typing import Dict, List
 from datetime import datetime
-from pyrogram.errors import FloodWait
+from pyrogram.errors import FloodWait, PeerIdInvalid
 import os
 import re
 import subprocess
 import helper  # Ensure this module is available
-from pyrogram.errors.exceptions.bad_request_400 import StickerEmojiInvalid                                                        
-import requests                                                        
-import json                                                                                                                
-from pyrogram import Client, filters                   
-from pyrogram.types.messages_and_media import message                                                        
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup                                                
-from pyrogram.errors import FloodWait, PeerIdInvalid                                                                                                               
-from pyrogram.types import Message                                                        
-from pyrogram import Client, filters                                                        
-from p_bar import progress_bar                                                        
-from subprocess import getstatusoutput                                                        
-from aiohttp import ClientSession                                                        
-import logging as std_logging                                                        
-import time                                                                                                                
-from pyrogram.types import User, Message                                                        
-import sys                                                        
+from pyrogram.errors.exceptions.bad_request_400 import StickerEmojiInvalid
+import requests
+import json
+from pyrogram import Client, filters
+from pyrogram.types.messages_and_media import message
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.types import Message
+from p_bar import progress_bar
+from subprocess import getstatusoutput
+from aiohttp import ClientSession
+import logging as std_logging
+import time
+from pyrogram.types import User, Message
+import sys
 import tempfile
 from urllib.parse import urlparse, parse_qs
 from bs4 import BeautifulSoup
@@ -59,7 +57,9 @@ HEADERS = {
     'Host': 'api.penpencil.co',
     'client-id': '5eb393ee95fab7468a79d189',
     'client-version': '1910',
-    'user-agent': 'Mozilla/5.0 (Linux; Android 12; M2101K6P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36',
+    'user-agent': 'Mozilla/5.0 (Linux; Android 12; M2101K6P) Apple
+
+WebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36',
     'randomid': '72012511-256c-4e1c-b4c7-29d67136af37',
     'client-type': 'WEB',
     'content-type': 'application/json; charset=utf-8',
@@ -73,9 +73,6 @@ bot = Client(
     api_id=int(os.environ.get("API_ID", "23713783")),
     api_hash=os.environ.get("API_HASH", "2daa157943cb2d76d149c4de0b036a99")
 )
-
-# Telegram channel ID (replace with your channel's chat ID, e.g., @YourChannel or -100123456789)
-CHANNEL_ID = "-1002472817328"
 
 async def fetch_pwwp_data(session: aiohttp.ClientSession, url: str, headers: Dict):
     async with session.get(url, headers=headers) as response:
@@ -145,7 +142,7 @@ async def get_pwwp_all_todays_schedule_content(session: aiohttp.ClientSession, s
         logger.warning("No today's schedule data found.")
     return all_content
 
-async def process_and_send_content(content: str, bot: Client):
+async def process_and_send_content(content: str, bot: Client, chat_id: str):
     try:
         # Parse content (format: "name: url")
         name, url = content.split(":", 1)
@@ -177,30 +174,30 @@ async def process_and_send_content(content: str, bot: Client):
                 download_cmd = f"{cmd} -R 25 --fragment-retries 25"
                 subprocess.run(download_cmd, shell=True, check=True)
                 await bot.send_document(
-                    chat_id=CHANNEL_ID,
+                    chat_id=chat_id,
                     document=f'{name}.pdf',
                     caption=cc1
                 )
                 os.remove(f'{name}.pdf')
             except Exception as e:
                 logger.error(f"Error downloading PDF {url}: {e}")
-                await bot.send_message(CHANNEL_ID, f"Failed to download PDF: {url}")
+                await bot.send_message(chat_id, f"Failed to download PDF: {url}")
         elif "/master.m3u8" in url:
             try:
                 Show = f"**⥥ 📥 ＤＯＷＮＬＯＡＤＩＮＧ 📥 :-**\n\n**📝Name »** `{name}`\n**❄𝐐𝐮𝐚𝐥𝐢𝐭𝐲 » 720p**\n\n**Bot made by MR (Daddy)🧑🏻‍💻**"
-                prog = await bot.send_message(CHANNEL_ID, Show)
+                prog = await bot.send_message(chat_id, Show)
                 res_file = await helper.download_video(url, f'yt-dlp -f "{ytf}" -o "{name}.%(ext)s" "{url}"', name)
                 filename = res_file
                 await prog.delete(True)
                 await helper.send_vid(bot, None, cc, filename, thumb, name, prog)
             except Exception as e:
                 logger.error(f"Error processing video {url}: {e}")
-                await bot.send_message(CHANNEL_ID, f"Failed to process video: {url}\n\n**{cc}**")
+                await bot.send_message(chat_id, f"Failed to process video: {url}\n\n**{cc}**")
     except Exception as e:
         logger.error(f"Error processing content {content}: {e}")
-        await bot.send_message(CHANNEL_ID, f"Error processing content: {content}")
+        await bot.send_message(chat_id, f"Error processing content: {content}")
 
-async def monitor_todays_schedule(bot: Client):
+async def monitor_todays_schedule(bot: Client, chat_id: str):
     seen_items = set()
     async with aiohttp.ClientSession() as session:
         while True:
@@ -210,9 +207,9 @@ async def monitor_todays_schedule(bot: Client):
 
                 if new_items:
                     current_time = datetime.now().strftime("%H:%M:%S")
-                    await bot.send_message(CHANNEL_ID, f"**New Content Found at {current_time}:**")
+                    await bot.send_message(chat_id, f"**New Content Found at {current_time}:**")
                     for item in new_items:
-                        await process_and_send_content(item, bot)
+                        await process_and_send_content(item, bot, chat_id)
                     seen_items.update(new_items)
                 else:
                     logger.info(f"No new content. Checked at {datetime.now().strftime('%H:%M:%S')}")
@@ -220,25 +217,42 @@ async def monitor_todays_schedule(bot: Client):
                 await asyncio.sleep(300)  # Check every 5 minutes (300 seconds)
             except Exception as e:
                 logger.error(f"Error occurred: {e}")
-                await bot.send_message(CHANNEL_ID, f"Error in monitoring: {e}")
+                await bot.send_message(chat_id, f"Error in monitoring: {e}")
                 await asyncio.sleep(300)  # Even if error, wait and retry
+
+# Handler for /now command
+@bot.on_message(filters.command("now") & filters.chat(filters.channel))
+async def start_monitoring(client: Client, message: Message):
+    chat_id = str(message.chat.id)
+    try:
+        # Check if the bot is an admin in the channel
+        chat = await client.get_chat(chat_id)
+        admins = await chat.get_members(filter="administrators")
+        bot_id = (await client.get_me()).id
+        is_admin = any(admin.user.id == bot_id for admin in admins)
+
+        if not is_admin:
+            await client.send_message(chat_id, "Please make me an admin in this channel to proceed.")
+            return
+
+        # Resolve peer to ensure the chat is accessible
+        await client.resolve_peer(chat_id)
+
+        # Send confirmation and start monitoring
+        await client.send_message(chat_id, "Bot started monitoring for new content in this channel.")
+        asyncio.create_task(monitor_todays_schedule(client, chat_id))
+    except PeerIdInvalid:
+        await client.send_message(chat_id, "Invalid channel ID or the bot does not have access. Please ensure the bot is added to the channel.")
+    except Exception as e:
+        logger.error(f"Error starting monitoring for chat {chat_id}: {e}")
+        await client.send_message(chat_id, f"Failed to start monitoring: {e}")
 
 async def main(loop: asyncio.AbstractEventLoop):
     async with bot:
         try:
-            # Retry peer resolution up to 3 times
-            for attempt in range(3):
-                try:
-                    await bot.resolve_peer(CHANNEL_ID)
-                    break
-                except PeerIdInvalid as e:
-                    logger.warning(f"Peer resolution attempt {attempt + 1} failed: {e}")
-                    if attempt == 2:
-                        logger.error(f"Invalid CHANNEL_ID: {CHANNEL_ID}. Ensure the bot is an admin in the channel.")
-                        raise PeerIdInvalid(f"Invalid CHANNEL_ID: {CHANNEL_ID}. Add the bot as an admin and verify the ID.")
-                    await asyncio.sleep(2)  # Wait before retrying
-            await bot.send_message(CHANNEL_ID, "Bot started monitoring for new content.")
-            await monitor_todays_schedule(bot)
+            await bot.start()
+            logger.info("Bot started successfully.")
+            await asyncio.Event().wait()  # Keep the bot running
         except Exception as e:
             logger.error(f"Startup error: {e}")
             print(f"ERROR: Startup failed: {e}")
