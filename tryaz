@@ -1,7 +1,15 @@
+import asyncio
+import aiohttp
+from typing import Dict, List
+from datetime import datetime
+from pyrogram.errors import FloodWait
+import os
+import re
+import subprocess
+import helper  # Ensure this module is available
 from pyrogram.errors.exceptions.bad_request_400 import StickerEmojiInvalid                                                        
 import requests                                                        
-import json                                                        
-import subprocess                                                        
+import json                                                                                                                
 from pyrogram import Client, filters                   
 from pyrogram.types.messages_and_media import message                                                        
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup                                                
@@ -12,101 +20,194 @@ from pyrogram import Client, filters
 from p_bar import progress_bar                                                        
 from subprocess import getstatusoutput                                                        
 from aiohttp import ClientSession                                                        
-import helper                                                        
 from logger import logging                                                        
-import time                                                        
-import asyncio                                                        
+import time                                                                                                                
 from pyrogram.types import User, Message                                                        
 import sys                                                        
-import re                                                        
-import os
 import tempfile
 from urllib.parse import urlparse, parse_qs
 from bs4 import BeautifulSoup
-import datetime
-import aiohttp
-                                                        
-bot = Client("bot",                                                        
-             bot_token=os.environ.get("BOT_TOKEN", "7251113580:AAFOIpTAGHALclWZBexgNbevU_z6qyZuGnU"),                                                        
-             api_id=int(os.environ.get("API_ID", "23713783")),                                                        
-             api_hash=os.environ.get("API_HASH", "2daa157943cb2d76d149c4de0b036a99"))
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
-                                                           
-    await editable.edit("**USE THIS - `https://i.ibb.co/W6d91vd/66f7961e.jpg` **")  
-    input6 = message = await bot.listen(editable.chat.id)
-    raw_text6 = input6.text
-    await input6.delete(True)
-    #await editable.delete()
-    thumb = input6.text
-                                                            
-                                                            
-    if thumb.startswith("http://") or thumb.startswith("https://"):                                                        
-        getstatusoutput(f"wget '{thumb}' -O 'thumb.jpg'")                                                        
-        thumb = "thumb.jpg"                                                        
-    else:                                                        
-        thumb == "no"                                                        
-                                                        
-    if len(links) == 1:                                                        
-        count = 1                                                        
-    else:                                                        
-        count = int(raw_text)                                                        
-                                                        
-    try:                                                        
-        for i in range(count - 1, len(links)):                                                        
-                                                        
-            V = links[i][1].replace("file/d/","uc?export=download&id=").replace("www.youtube-nocookie.com/embed", "youtu.be").replace("?modestbranding=1", "").replace("/view?usp=sharing","") # .replace("mpd","m3u8")                                                        
-            url = "https://" + V                                                        
-                                                                                                                
-            if '/master.mpd' in url:                                                        
-             id =  url.split("/")[-2]                                                        
-             url =  f"https://madxapi-d0cbf6ac738c.herokuapp.com/{id}/master.m3u8&token={ACCESS_TOKEN}"            
-                                            
-            name1 = links[i][0].replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "@").replace("*", "").replace("https", "").replace("http", "").replace("NONE", "https://t.me/HIDEUC").strip()                                                        
-            name = f'{name1[:60]}'               
+# PenPencil API credentials
+ACCESS_TOKEN = "your_access_token_here"  # Replace with your PenPencil API token
+BATCH_ID = "your_batch_id_here"  # Replace with your batch ID
 
-            if "youtu" in url:                                                        
-                ytf = f"b[height<=720][ext=mp4]/bv[height<=720][ext=mp4]+ba[ext=m4a]/b[ext=mp4]"                                                        
-            else:                                                        
-                ytf = f"b[height<=720]/bv[height<=720]+ba/b/bv+ba"
-                                                                                                                                                                       
-            try:                                                          
-                                                                        
-                cc = f'**{name1}.mkv**\n\n**𝗕𝗮𝘁𝗰𝗵 - OP**'
-                cc1 = f'**{name1}.pdf**\n\n**𝗕𝗮𝘁𝗰𝗵 - OP**'
-                                                                                                                                
-                if ".pdf" in url:                                                        
-                    try:                                                        
-                        cmd = f'yt-dlp -o "{name}.pdf" "{url}"'                                                        
-                        download_cmd = f"{cmd} -R 25 --fragment-retries 25"                                                        
-                        os.system(download_cmd)                                                        
-                        copy = await bot.send_document(chat_id=m.chat.id, document=f'{name}.pdf', caption=cc1)                                                        
-                        count += 1                                                        
-                        os.remove(f'{name}.pdf')                                                        
-                    except FloodWait as e:                                                        
-                        await m.reply_text(str(e))                                                        
-                        time.sleep(e.x)                                                        
-                        continue                                                        
-                else:                                                        
-                    Show = f"**⥥ 📥 ＤＯＷＮＬＯＤＩＮＧ 📥 :-**\n\n**📝Name »** `{name}\n❄𝐐𝐮𝐚𝐥𝐢𝐭𝐲 » 720p`\n\n**Url :-** `Kya karega URL dekhke ☠️☠️`\n\n **Bot made by {MR} (Daddy)🧑🏻‍💻**"                                                        
-                    prog = await m.reply_text(Show)                                                        
-                    res_file = await helper.download_video(url, cmd, name)                                                        
-                    filename = res_file                                                        
-                    await prog.delete(True)                                                        
-                    await helper.send_vid(bot, m, cc, filename, thumb, name, prog)                                                        
-                    count += 1                                                        
-                    time.sleep(1)                                                        
-                                                        
-            except Exception as e:                                                        
-                await m.reply_text(                                                        
-                    f"**𝐖𝐚𝐭𝐜𝐡 𝐓𝐡𝐢𝐬 𝐎𝐧 𝐘𝐎𝐔𝐓𝐔𝐁𝐄 🙏**\n\n**{url}**\n\n**{cc}**"                                                        
-                )                                                        
-                continue                                                        
-                                                        
-    except Exception as e:                                                        
-        await m.reply_text(e)                                                        
-    await m.reply_text("**Done✅**")                                                        
-                                                        
-                                                        
-bot.run()                                                        
-                                                        
+# PenPencil API headers
+HEADERS = {
+    'Host': 'api.penpencil.co',
+    'client-id': '5eb393ee95fab7468a79d189',
+    'client-version': '1910',
+    'user-agent': 'Mozilla/5.0 (Linux; Android 12; M2101K6P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36',
+    'randomid': '72012511-256c-4e1c-b4c7-29d67136af37',
+    'client-type': 'WEB',
+    'content-type': 'application/json; charset=utf-8',
+    'authorization': f"Bearer {ACCESS_TOKEN}",
+}
+
+# Telegram bot setup
+bot = Client(
+    "bot",
+    bot_token=os.environ.get("BOT_TOKEN", "7251113580:AAFOIpTAGHALclWZBexgNbevU_z6qyZuGnU"),
+    api_id=int(os.environ.get("API_ID", "23713783")),
+    api_hash=os.environ.get("API_HASH", "2daa157943cb2d76d149c4de0b036a99")
+)
+
+# Telegram channel ID (replace with your channel's chat ID, e.g., @YourChannel or -100123456789)
+CHANNEL_ID = "your_channel_id_here"
+
+async def fetch_pwwp_data(session: aiohttp.ClientSession, url: str, headers: Dict):
+    async with session.get(url, headers=headers) as response:
+        if response.status == 200:
+            return await response.json()
+        else:
+            logging.warning(f"Failed to fetch data from {url}")
+            return None
+
+async def get_pwwp_todays_schedule_content_details(session: aiohttp.ClientSession, selected_batch_id, subject_id, schedule_id, headers: Dict) -> List[str]:
+    url = f"https://api.penpencil.co/v1/batches/{selected_batch_id}/subject/{subject_id}/schedule/{schedule_id}/schedule-details"
+    data = await fetch_pwwp_data(session, url, headers)
+    content = []
+
+    if data and data.get("success") and data.get("data"):
+        data_item = data["data"]
+        
+        video_details = data_item.get('videoDetails', {})
+        if video_details:
+            name = data_item.get('topic')
+            videoUrl = video_details.get('videoUrl') or video_details.get('embedCode')
+            if videoUrl and ("/master.mpd" in videoUrl or ".pdf" in videoUrl):
+                line = f"{name}: {videoUrl}"
+                content.append(line)
+               
+        homework_ids = data_item.get('homeworkIds', [])
+        for homework in homework_ids:
+            attachment_ids = homework.get('attachmentIds', [])
+            name = homework.get('topic')
+            for attachment in attachment_ids:
+                url = attachment.get('baseUrl', '') + attachment.get('key', '')
+                if url and ("/master.mpd" in url or ".pdf" in url):
+                    line = f"{name}: {url}"
+                    content.append(line)
+                
+        dpp = data_item.get('dpp')
+        if dpp:
+            dpp_homework_ids = dpp.get('homeworkIds', [])
+            for homework in dpp_homework_ids:
+                attachment_ids = homework.get('attachmentIds', [])
+                name = homework.get('topic')
+                for attachment in attachment_ids:
+                    url = attachment.get('baseUrl', '') + attachment.get('key', '')
+                    if url and ("/master.mpd" in url or ".pdf" in url):
+                        line = f"{name}: {url}"
+                        content.append(line)
+    else:
+        logging.warning(f"No Data Found For Schedule ID - {schedule_id}")
+    return content
+
+async def get_pwwp_all_todays_schedule_content(session: aiohttp.ClientSession, selected_batch_id: str, headers: Dict) -> List[str]:
+    url = f"https://api.penpencil.co/v1/batches/{selected_batch_id}/todays-schedule"
+    todays_schedule_details = await fetch_pwwp_data(session, url, headers)
+    all_content = []
+
+    if todays_schedule_details and todays_schedule_details.get("success") and todays_schedule_details.get("data"):
+        tasks = []
+        for item in todays_schedule_details['data']:
+            schedule_id = item.get('_id')
+            subject_id = item.get('batchSubjectId')
+            task = asyncio.create_task(get_pwwp_todays_schedule_content_details(session, selected_batch_id, subject_id, schedule_id, headers))
+            tasks.append(task)
+        results = await asyncio.gather(*tasks)
+        for result in results:
+            all_content.extend(result)
+    else:
+        logging.warning("No today's schedule data found.")
+    return all_content
+
+async def process_and_send_content(content: str, bot: Client):
+    try:
+        # Parse content (format: "name: url")
+        name, url = content.split(":", 1)
+        name = name.strip()
+        url = url.strip()
+
+        # Clean name for filename
+        name1 = name.replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "@").replace("*", "").replace("https", "").replace("http", "").strip()
+        name = f'{name1[:60]}'
+
+        # Prepare captions
+        cc = f'**{name1}.mkv**\n\n**𝗕𝗮𝘁𝗰𝗵 - OP**'
+        cc1 = f'**{name1}.pdf**\n\n**𝗕𝗮𝘁𝗰𝗵 - OP**'
+
+        # Set YouTube format (though not used for MPD/PDF)
+        ytf = f"b[height<=720]/bv[height<=720]+ba/b/bv+ba"
+
+        # Handle MPD URLs
+        if '/master.mpd' in url:
+            id = url.split("/")[-2]
+            url = f"https://madxapi-d0cbf6ac738c.herokuapp.com/{id}/master.m3u8&token={ACCESS_TOKEN}"
+
+        # Hardcode thumbnail (or use a default one)
+        thumb = "no"  # Replace with a default thumbnail URL or path if needed
+
+        if ".pdf" in url:
+            try:
+                cmd = f'yt-dlp -o "{name}.pdf" "{url}"'
+                download_cmd = f"{cmd} -R 25 --fragment-retries 25"
+                subprocess.run(download_cmd, shell=True, check=True)
+                await bot.send_document(
+                    chat_id=CHANNEL_ID,
+                    document=f'{name}.pdf',
+                    caption=cc1
+                )
+                os.remove(f'{name}.pdf')
+            except Exception as e:
+                logging.error(f"Error downloading PDF {url}: {e}")
+                await bot.send_message(CHANNEL_ID, f"Failed to download PDF: {url}")
+        elif "/master.m3u8" in url:
+            try:
+                Show = f"**⥥ 📥 ＤＯＷＮＬＯＡＤＩＮＧ 📥 :-**\n\n**📝Name »** `{name}`\n**❄𝐐𝐮𝐚𝐥𝐢𝐭𝐲 » 720p**\n\n**Bot made by MR (Daddy)🧑🏻‍💻**"
+                prog = await bot.send_message(CHANNEL_ID, Show)
+                res_file = await helper.download_video(url, f'yt-dlp -f "{ytf}" -o "{name}.%(ext)s" "{url}"', name)
+                filename = res_file
+                await prog.delete(True)
+                await helper.send_vid(bot, None, cc, filename, thumb, name, prog)
+            except Exception as e:
+                logging.error(f"Error processing video {url}: {e}")
+                await bot.send_message(CHANNEL_ID, f"Failed to process video: {url}\n\n**{cc}**")
+    except Exception as e:
+        logging.error(f"Error processing content {content}: {e}")
+        await bot.send_message(CHANNEL_ID, f"Error processing content: {content}")
+
+async def monitor_todays_schedule(bot: Client):
+    seen_items = set()
+    async with aiohttp.ClientSession() as session:
+        while True:
+            try:
+                all_content = await get_pwwp_all_todays_schedule_content(session, BATCH_ID, HEADERS)
+                new_items = [item for item in all_content if item not in seen_items]
+
+                if new_items:
+                    current_time = datetime.now().strftime("%H:%M:%S")
+                    await bot.send_message(CHANNEL_ID, f"**New Content Found at {current_time}:**")
+                    for item in new_items:
+                        await process_and_send_content(item, bot)
+                    seen_items.update(new_items)
+                else:
+                    logging.info(f"No new content. Checked at {datetime.now().strftime('%H:%M:%S')}")
+
+                await asyncio.sleep(300)  # Check every 5 minutes (300 seconds)
+            except Exception as e:
+                logging.error(f"Error occurred: {e}")
+                await bot.send_message(CHANNEL_ID, f"Error in monitoring: {e}")
+                await asyncio.sleep(300)  # Even if error, wait and retry
+
+async def main():
+    async with bot:
+        await bot.send_message(CHANNEL_ID, "Bot started monitoring for new content.")
+        await monitor_todays_schedule(bot)
+
+if __name__ == "__main__":
+    asyncio.run(main())
