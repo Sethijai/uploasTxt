@@ -58,7 +58,7 @@ async def restart_handler(_, m):
 
 @bot.on_message(filters.command([OP_COMMAND]))
 async def fetch_pwwp_data(session: aiohttp.ClientSession, url: str, headers: Dict):
-    async with session.get(url, headers=headers) as response:
+    async with session.get(url, headers=HEADERS) as response:
         if response.status == 200:
             return await response.json()
         else:
