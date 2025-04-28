@@ -2,26 +2,26 @@ import asyncio
 import aiohttp
 from typing import Dict, List
 from datetime import datetime
-from pyrofork.errors import FloodWait
+from pyrogram.errors import FloodWait
 import os
 import re
 import subprocess
 import helper  # Ensure this module is available
-from pyrofork.errors.exceptions.bad_request_400 import StickerEmojiInvalid                                                        
+from pyrogram.errors.exceptions.bad_request_400 import StickerEmojiInvalid                                                        
 import requests                                                        
 import json                                                                                                                
-from pyrofork import Client, filters                   
-from pyrofork.types.messages_and_media import message                                                        
-from pyrofork.types import InlineKeyboardButton, InlineKeyboardMarkup                                                
-from pyrofork.errors import FloodWait, PeerIdInvalid                                                                                                               
-from pyrofork.types import Message                                                        
-from pyrofork import Client, filters                                                        
+from pyrogram import Client, filters                   
+from pyrogram.types.messages_and_media import message                                                        
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup                                                
+from pyrogram.errors import FloodWait, PeerIdInvalid                                                                                                               
+from pyrogram.types import Message                                                        
+from pyrogram import Client, filters                                                        
 from p_bar import progress_bar                                                        
 from subprocess import getstatusoutput                                                        
 from aiohttp import ClientSession                                                        
 import logging as std_logging                                                        
 import time                                                                                                                
-from pyrofork.types import User, Message                                                        
+from pyrogram.types import User, Message                                                        
 import sys                                                        
 import tempfile
 from urllib.parse import urlparse, parse_qs
