@@ -97,7 +97,7 @@ async def cancel_process(bot: Client, m: Message):
     else:
         await m.reply_text("No process to cancel.")
 
-# New handler for processing messages in the format "name: URL"
+# Handler for processing messages in the format "name: URL"
 @bot.on_message(filters.text & ~filters.command(["h2t", "h2tm", "cancel", STOP_COMMAND]))
 async def process_link(bot: Client, m: Message):
     # Regex to match the format "name: URL"
@@ -111,8 +111,11 @@ async def process_link(bot: Client, m: Message):
     name1 = match.group(1).strip()
     url = match.group(2).strip()
 
+    # Delete the input message
+    await m.delete()
+
     # Default values
-    b_name = "Default Batch"
+    b_name = "Prayas Jee 2026"
     OP = "HACKHEIST"
     NO_BW = "NOISE"
     MR = "[@TEAM_OPTECH]"
@@ -164,7 +167,7 @@ async def process_link(bot: Client, m: Message):
 
     elif '/master.mpd' in url:
         id = url.split("/")[-2]
-        url = f"https://madxapi-d0cbf6ac738c.herokuapp.com/{id}/master.m3u8&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzgzNzI5NDkuNDkyLCJkYXRhIjp7Il9pZCI6IjY0YjY0NDhkNjAxYWM2MDAxOGQ5ODE1MyIsInVzZXJuYW1lIjoiOTM1MjYzMTczMSIsImZpcnN0TmFtZSI6Ik5hbWFuIiwibGFzdE5hbWUiOiIiLCJvcmdhbml6YXRpb24iOnsiX2lkIjoiNWViMzkzZWU5NWZhYjc0NjhhNzlkMTg5Iiwid2Vic2l0ZSI6InBoeXNpY3N3YWxsYWguY29tIiwibmFtZSI6IlBoeXNpY3N3YWxsYWgifSwiZW1haWwiOiJvcG1hc3Rlcjk4NTRAZ21haWwuY29tIiwicm9sZXMiOlsiNWIyN2JkOTY1ODQyZjk1MGE3NzhjNmVmIl0sImNvdW50cnlHcm91cCI6IklOIiwidHlwZSI6IlVTRVIifSwiaWF0IjoxNzM3NzY4MTQ5fQ.2XmPDj4eXBQc1Hn23Ssy8aPIURrgYnikLqgkYi6qHYY"
+        url = f"https://as-multiverse-b0b2769da88f.herokuapp.com/{id}/master.m3u8&token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3NDYzMzkwMzkuMDQ0LCJkYXRhIjp7Il9pZCI6IjY0YjY0NDhkNjAxYWM2MDAxOGQ5ODE1MyIsInVzZXJuYW1lIjoiOTM1MjYzMTczMSIsImZpcnN0TmFtZSI6Ik5hbWFuIiwibGFzdE5hbWUiOiIiLCJvcmdhbml6YXRpb24iOnsiX2lkIjoiNWViMzkzZWU5NWZhYjc0NjhhNzlkMTg5Iiwid2Vic2l0ZSI6InBoeXNpY3N3YWxsYWguY29tIiwibmFtZSI6IlBoeXNpY3N3YWxsYWgifSwiZW1haWwiOiJvcG1hc3Rlcjk4NTRAZ21haWwuY29tIiwicm9sZXMiOlsiNWIyN2JkOTY1ODQyZjk1MGE3NzhjNmVmIl0sImNvdW50cnlHcm91cCI6IklOIiwidHlwZSI6IlVTRVIifSwiaWF0IjoxNzQ1NzM0MjM5fQ.GNUr2USwCUeV7Y8gWsyIp3yuGnaSdrg7bbjkCBSdguI"
 
     elif '/output.webm' in url:
         url = url.replace('/output.webm', '/hls/master.m3u8')
@@ -222,6 +225,9 @@ async def process_link(bot: Client, m: Message):
         await m.reply_text(f"Error processing {url}: {str(e)}")
         return
 
-    await m.reply_text("**Done✅**")
+    # Send "Done✅" message and delete it after 5 seconds
+    done_msg = await m.reply_text("**Done✅**")
+    await asyncio.sleep(5)
+    await done_msg.delete()
 
 bot.run()
