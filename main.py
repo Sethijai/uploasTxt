@@ -104,7 +104,7 @@ async def process_link(bot: Client, m: Message):
     pattern = r"^(.*?):\s*(https?://[^\s]+)$"
     match = re.match(pattern, m.text.strip())
     if not match:
-        await m.reply_text("Invalid format. Please send in the format: `Name: URL`")
+        await m.reply_text("")
         return
 
     # Extract name and URL
