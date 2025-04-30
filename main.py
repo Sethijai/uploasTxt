@@ -111,15 +111,15 @@ async def process_link(bot: Client, m: Message):
     name1 = match.group(1).strip()
     url = match.group(2).strip()
 
-    # Default values (modify as needed)
-    b_name = "Default Batch"  # Batch name
-    OP = "HACKHEIST"          # Name prefix
-    NO_BW = "NOISE"           # No BW token
-    MR = "[@TEAM_OPTECH]"     # Name suffix
-    WEB = "WEB"               # Website URL
-    thumb = "https://i.ibb.co/W6d91vd/66f7961e.jpg"  # Thumbnail
-    raw_text2 = "720"         # Resolution (default to 720p)
-    res = "1280x720"          # Corresponding resolution
+    # Default values
+    b_name = "Default Batch"
+    OP = "HACKHEIST"
+    NO_BW = "NOISE"
+    MR = "[@TEAM_OPTECH]"
+    WEB = "WEB"
+    thumb = "https://i.ibb.co/W6d91vd/66f7961e.jpg"
+    raw_text2 = "720"
+    res = "1280x720"
 
     # Process thumbnail
     if thumb.startswith("http://") or thumb.startswith("https://"):
@@ -132,7 +132,7 @@ async def process_link(bot: Client, m: Message):
     name1_clean = name1.replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "@").replace("*", "").replace("https", "").replace("http", "").replace("NONE", "https://t.me/HIDEUC").strip()
     name = f'{OP}_{name1_clean[:60]}'
 
-    # Process URL based on original logic
+    # Process URL
     V = url.replace("file/d/", "uc?export=download&id=").replace("www.youtube-nocookie.com/embed", "youtu.be").replace("?modestbranding=1", "").replace("/view?usp=sharing", "")
     url = V if V.startswith("https://") else "https://" + V
 
@@ -169,10 +169,10 @@ async def process_link(bot: Client, m: Message):
     elif '/output.webm' in url:
         url = url.replace('/output.webm', '/hls/master.m3u8')
 
-    # Determine ytf format
+    # Determine ytf format for videos
     ytf = f"b[height<={raw_text2}][ext=mp4]/bv[height<={raw_text2}][ext=mp4]+ba[ext=m4a]/b[ext=mp4]" if "youtu" in url else f"b[height<={raw_text2}]/bv[height<={raw_text2}]+ba/b/bv+ba"
 
-    # Construct download command
+    # Construct download command for videos
     cmd = f'yt-dlp -o "{name}.mp4" "{url}"' if "jw-prod" in url else f'yt-dlp -f "{ytf}" "{url}" -o "{name}.mp4"'
 
     try:
@@ -185,19 +185,28 @@ async def process_link(bot: Client, m: Message):
                 await bot.send_document(chat_id=m.chat.id, document=ka, caption=cc1)
                 os.remove(ka)
             except FloodWait as e:
-                await m.reply_text(str(e))
+                await m.reply_text(f"FloodWait: {e}. Retrying after {e.x} seconds.")
                 time.sleep(e.x)
+                return
+            except Exception as e:
+                await m.reply_text(f"Error downloading Google Drive file: {str(e)}")
                 return
 
         elif ".pdf" in url:
             try:
-                download_cmd = f"{cmd} -R 25 --fragment-retries 25"
-                os.system(download_cmd)
-                await bot.send_document(chat_id=m.chat.id, document=f'{name}.pdf', caption=cc1)
-                os.remove(f'{name}.pdf')
-            except FloodWait as e:
-                await m.reply_text(str(e))
-                time.sleep(e.x)
+                # Download PDF using aiohttp
+                async with ClientSession() as session:
+                    async with session.get(url) as resp:
+                        if resp.status == 200:
+                            pdf_path = f"{name}.pdf"
+                            with open(pdf_path, 'wb') as f:
+                                f.write(await resp.read())
+                            await bot.send_document(chat_id=m.chat.id, document=pdf_path, caption=cc1)
+                            os.remove(pdf_path)
+                        else:
+                            await m.reply_text(f"Failed to download PDF: HTTP {resp.status}")
+            except Exception as e:
+                await m.reply_text(f"Error downloading PDF: {str(e)}")
                 return
 
         else:
@@ -210,7 +219,7 @@ async def process_link(bot: Client, m: Message):
             time.sleep(1)
 
     except Exception as e:
-        await m.reply_text(f"**𝐖𝐚𝐭𝐜𝐡 𝐓𝐡𝐢𝐬 𝐎𝐧 𝐘𝐎𝐔𝐓𝐔𝐁𝐄 🙏**\n\n**{url}**\n\n**{cc}**")
+        await m.reply_text(f"Error processing {url}: {str(e)}")
         return
 
     await m.reply_text("**Done✅**")
