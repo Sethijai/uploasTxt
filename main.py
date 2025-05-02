@@ -167,7 +167,7 @@ async def process_link(bot: Client, m: Message):
 
     elif '/master.mpd' in url:
         id = url.split("/")[-2]
-        token_url = f"https://alphacbde-papa-api.vercel.app/token?videoId={id}"
+        token_url = f"https://media.alphacbse.fun/token?videoId={id}"
         max_retries = 3
         retry_delay = 2  # seconds
 
@@ -191,7 +191,7 @@ async def process_link(bot: Client, m: Message):
                 return
 
             # Construct and check m3u8 URL with retries
-            m3u8_url = f"https://alphacbde-papa-api.vercel.app/{message}/hls/720/main.m3u8"
+            m3u8_url = f"https://media.alphacbse.fun/{message}/hls/720/main.m3u8"
             for attempt in range(max_retries):
                 try:
                     async with session.head(m3u8_url) as resp:
